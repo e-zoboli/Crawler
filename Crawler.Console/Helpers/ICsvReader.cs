@@ -1,4 +1,4 @@
-namespace Crawler.Console.Utils;
+namespace Crawler.Console.Helpers;
 
 public interface ICsvReader
 {
