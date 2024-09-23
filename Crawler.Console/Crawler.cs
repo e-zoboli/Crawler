@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Crawler.Console;
 
-public class Crawler(IHttpClientFactory httpClientFactory, ICsvReader csvReader, ILogger<Crawler> logger): BackgroundService
+public class Crawler(IHttpClientFactory httpClientFactory, ICsvReader csvReader, IHostApplicationLifetime hostApplicationLifetime, ILogger<Crawler> logger): BackgroundService
 {
     private async Task<IEnumerable<HtmlData?>> GetContentAsync(string urlsPath)
     {
@@ -37,7 +37,7 @@ public class Crawler(IHttpClientFactory httpClientFactory, ICsvReader csvReader,
 
     private static HtmlData? MapToData(string url, string content)
     {
-        return string.IsNullOrWhiteSpace(content) ? null : new HtmlData(url, content, DateTime.Now);
+        return string.IsNullOrWhiteSpace(content) ? null : new HtmlData(url, DateTime.Now, content);
     }
 
     private static void WriteToFile(IEnumerable<HtmlData?> htmlData, string filePath)
@@ -51,12 +51,14 @@ public class Crawler(IHttpClientFactory httpClientFactory, ICsvReader csvReader,
         while (!stoppingToken.IsCancellationRequested)
         {
             logger.LogInformation("Crawler running at: {time}", DateTimeOffset.Now);
-            string urlsPath = "urls.csv";
-            var contents = await GetContentAsync(urlsPath).ConfigureAwait(false);
-            var pathToWrite = Directory.GetCurrentDirectory() + "results.json";
+            string parentDirectory = Directory.GetParent(Directory.GetCurrentDirectory())!.FullName;
+            string urlsFilePath = Path.Combine(parentDirectory, "app", "data", "urls.csv");
+            var contents = await GetContentAsync(urlsFilePath).ConfigureAwait(false);
+            var pathToWrite = Path.Combine(parentDirectory, "app", "results", "results.json");
             WriteToFile(contents, pathToWrite);
             
-            await Task.Delay(10000, stoppingToken).ConfigureAwait(false);
+            logger.LogInformation("Crawler is stopping");
+            hostApplicationLifetime.StopApplication();
         }
         
     }
