@@ -4,16 +4,16 @@ namespace Crawler.Console.Helpers;
 
 public class HtmlProcessor : IHtmlProcessor
 {
-    private IEnumerable<string> ExtractLinks(string html)
+    private static IEnumerable<string> ExtractLinks(string html)
     {
-        var pattern = @"https?://[^\s/$.?#].[^\s]*";
+        const string pattern = @"https?://[^\s/$.?#].[^\s]*";
         Regex regex = new(pattern);
-        return regex.Matches(html).Select(m => m.ToString());
+        return regex.Matches(html).Select(m => m.ToString().TrimEnd('"'));
     }
 
-    private IEnumerable<string> ExtractTitles(string html)
+    private static IEnumerable<string> ExtractTitles(string html)
     {
-        string pattern = @"<title>(.*?)</title>";
+        const string pattern = @"<title>(.*?)</title>";
         Regex regex = new(pattern, RegexOptions.IgnoreCase);
         return regex.Matches(html).Select(m => m.Groups[1].Value);
     }

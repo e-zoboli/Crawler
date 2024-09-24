@@ -75,8 +75,8 @@ public class Crawler(
         while (!stoppingToken.IsCancellationRequested)
         {
             logger.LogInformation("Crawler running at: {time}", DateTimeOffset.Now);
-            string parentDirectory = Directory.GetParent(Directory.GetCurrentDirectory())!.FullName;
-            string urlsFilePath = Path.Combine(parentDirectory, "app", "data", "urls.csv");
+            var parentDirectory = Directory.GetParent(Directory.GetCurrentDirectory())!.FullName;
+            var urlsFilePath = Path.Combine(parentDirectory, "app", "data", "urls.csv");
             var contents = await GetContentAsync(urlsFilePath).ConfigureAwait(false);
             var writingPath = Path.Combine(parentDirectory, "app", "results", "results.json");
             
