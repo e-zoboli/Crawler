@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Crawler.Console.Helpers;
 using Microsoft.Extensions.Hosting;
@@ -6,7 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Crawler.Console;
 
-public class Crawler(IHttpClientFactory httpClientFactory, ICsvReader csvReader, IHostApplicationLifetime hostApplicationLifetime, ILogger<Crawler> logger): BackgroundService
+public class Crawler(
+    IHttpClientFactory httpClientFactory, 
+    ICsvReader csvReader, 
+    IHostApplicationLifetime hostApplicationLifetime, 
+    IHtmlProcessor htmlProcessor, 
+    ILogger<Crawler> logger): BackgroundService
 {
     private async Task<IEnumerable<HtmlData?>> GetContentAsync(string urlsPath)
     {
