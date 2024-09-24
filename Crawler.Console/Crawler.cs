@@ -44,7 +44,12 @@ public class Crawler(
         return string.IsNullOrWhiteSpace(content) ? null : new HtmlData(url, DateTime.Now, content);
     }
 
-    private static void WriteToFile(IEnumerable<HtmlData?> htmlData, string filePath)
+    private static HtmlResult? MapToResult(string url, IEnumerable<string> links, IEnumerable<string> titles, DateTime retrievedAt)
+    {
+        return new HtmlResult(url, links, titles, DateTime.Now);
+    }
+
+    private static void WriteToFile(IEnumerable<HtmlResult?> htmlData, string filePath)
     {
         var options = new JsonSerializerOptions{WriteIndented = true};
         var json = JsonSerializer.Serialize(htmlData, options);
@@ -59,7 +64,15 @@ public class Crawler(
             string urlsFilePath = Path.Combine(parentDirectory, "app", "data", "urls.csv");
             var contents = await GetContentAsync(urlsFilePath).ConfigureAwait(false);
             var pathToWrite = Path.Combine(parentDirectory, "app", "results", "results.json");
-            WriteToFile(contents, pathToWrite);
+            IEnumerable<HtmlResult?> listOfResult = [];
+            foreach (var htmlData in contents)
+            {
+                var (links, titles) = htmlProcessor.ProcessHtml(htmlData!.HtmlContent);
+                var htmlProcessingResult = MapToResult(htmlData.Url, links, titles, htmlData.RetrievedAt);
+                listOfResult = listOfResult.Append(htmlProcessingResult);
+            }
+            
+            WriteToFile(listOfResult, pathToWrite);
             
             logger.LogInformation("Crawler is stopping");
             hostApplicationLifetime.StopApplication();
