@@ -1,6 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawler.Console", "Crawler.Console\Crawler.Console.csproj", "{4AB75D35-5353-4748-B32C-94EFBD26D4CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawler.Test", "Crawler.Test\Crawler.Test.csproj", "{D37E6DBF-1604-47DB-B005-A0783AF8E7D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +15,9 @@ Global
 		{4AB75D35-5353-4748-B32C-94EFBD26D4CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AB75D35-5353-4748-B32C-94EFBD26D4CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AB75D35-5353-4748-B32C-94EFBD26D4CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D37E6DBF-1604-47DB-B005-A0783AF8E7D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D37E6DBF-1604-47DB-B005-A0783AF8E7D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D37E6DBF-1604-47DB-B005-A0783AF8E7D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D37E6DBF-1604-47DB-B005-A0783AF8E7D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
