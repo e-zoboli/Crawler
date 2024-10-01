@@ -1,0 +1,15 @@
+
+services:
+  yourapp:
+    image: crawler:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - data:/app/data
+      - data:/app/results
+
+volumes:
+  data:
