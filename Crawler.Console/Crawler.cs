@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Crawler.Console.Helpers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -9,7 +8,7 @@ public class Crawler(
     IHttpClientFactory httpClientFactory,
     ICsvReader csvReader,
     IHostApplicationLifetime hostApplicationLifetime,
-    IHtmlProcessor htmlProcessor,
+    IDataProcessor dataProcessor,
     ILogger<Crawler> logger) : BackgroundService
 {
     private async Task<IEnumerable<HtmlData?>> GetContentAsync(string urlsPath)
@@ -25,7 +24,7 @@ public class Crawler(
                 response.EnsureSuccessStatusCode();
                 logger.LogInformation("Crawler call to {url} successful", url.Url);
                 var content = await response.Content.ReadAsStringAsync();
-                return MapToData(url.Url, content);
+                return dataProcessor.MapToData(url.Url, content);
             }
             catch (HttpRequestException e)
             {
@@ -39,37 +38,6 @@ public class Crawler(
         return results.Where(result => result != null);
     }
 
-    private static HtmlData? MapToData(string url, string content)
-    {
-        return string.IsNullOrWhiteSpace(content) ? null : new HtmlData(url, DateTime.Now, content);
-    }
-
-    private static HtmlResult? MapToResult(string url, IEnumerable<string> links, IEnumerable<string> titles, DateTime retrievedAt)
-    {
-        return new HtmlResult(url, links, titles, DateTime.Now);
-    }
-
-    private static void WriteToFile(IEnumerable<HtmlResult?> htmlData, string filePath)
-    {
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        var json = JsonSerializer.Serialize(htmlData, options);
-        File.WriteAllText(filePath, json);
-    }
-
-    private IEnumerable<HtmlResult?> ProcessData(IEnumerable<HtmlData?> contents)
-    {
-        IEnumerable<HtmlResult?> listOfResult = [];
-        foreach (var htmlData in contents)
-        {
-            var (links, titles) = htmlProcessor.ProcessHtml(htmlData!.HtmlContent);
-            var htmlProcessingResult = MapToResult(htmlData.Url, links, titles, htmlData.RetrievedAt);
-            listOfResult = listOfResult.Append(htmlProcessingResult);
-        }
-        
-        return listOfResult;
-
-    }
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -78,11 +46,10 @@ public class Crawler(
             var parentDirectory = Directory.GetParent(Directory.GetCurrentDirectory())!.FullName;
             var urlsFilePath = Path.Combine(parentDirectory, "app", "data", "urls.csv");
             var contents = await GetContentAsync(urlsFilePath).ConfigureAwait(false);
-            var writingPath = Path.Combine(parentDirectory, "app", "results", "results.json");
             
-            var results = ProcessData(contents);
+            var results = dataProcessor.ProcessData(contents);
 
-            WriteToFile(results, writingPath);
+            dataProcessor.SaveResult(results);
 
             logger.LogInformation("Crawler is stopping");
             hostApplicationLifetime.StopApplication();
