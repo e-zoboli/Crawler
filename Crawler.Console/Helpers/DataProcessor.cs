@@ -19,7 +19,7 @@ public class DataProcessor(IHtmlProcessor htmlProcessor, [FromKeyedServices("fil
         return listOfResult;
     }
 
-    public HtmlResult? MapToResult(string url, IEnumerable<string> links, IEnumerable<string> titles, DateTime retrievedAt)
+    public HtmlResult MapToResult(string url, IEnumerable<string> links, IEnumerable<string> titles, DateTime retrievedAt)
     {
         return new HtmlResult(url, links, titles, retrievedAt);
     }

@@ -1,6 +1,6 @@
 
 services:
-  yourapp:
+  crawler:
     image: crawler:latest
     build:
       context: .
